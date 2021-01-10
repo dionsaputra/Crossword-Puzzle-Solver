@@ -2,8 +2,8 @@ import sys
 import copy
 import os
 import time
-from crossword.crossword import Crossword
-from crossword.crossword import Block
+from crossword import Crossword
+from crossword import Block
 
 
 def clasify_solusi(solusi):
@@ -39,39 +39,11 @@ def get_min_class_idx(csol):
     return idx
 
 
-def is_str_match(tts, string, head, length, datar):
-    if length == len(string):
-        match = True
-        i = 0
-        c1 = "-"
-        if datar:
-            while i < length and match:
-                if (
-                    tts.getAt(head[0], head[1] + i) == c1
-                    or tts.getAt(head[0], head[1] + i) == string[i]
-                ):
-                    i += 1
-                else:
-                    match = False
-        else:
-            while i < length and match:
-                if (
-                    tts.getAt(head[0] + i, head[1]) == c1
-                    or tts.getAt(head[0] + i, head[1]) == string[i]
-                ):
-                    i += 1
-                else:
-                    match = False
-        return match
-    else:
-        return False
-
-
-def get_idx_sol(tts, csol, level, head, length, datar):
+def get_idx_sol(tts, csol, level, block: Block):
     idx = 0
     found = False
     while idx < len(csol[level]) and not found:
-        if is_str_match(tts, csol[level][idx][1], head, length, datar):
+        if tts.is_word_match(csol[level][idx][1], block):
             found = True
         else:
             idx += 1
@@ -80,16 +52,6 @@ def get_idx_sol(tts, csol, level, head, length, datar):
         return idx
     else:
         return -1
-
-
-def fill_tts(tts, block: Block, string):
-    if block.horizontal:
-        for i in range(block.length):
-            tts.setAt(block.head[0], block.head[1] + i, string[i])
-
-    else:
-        for i in range(block.length):
-            tts.setAt(block.head[0] + i, block.head[1], string[i])
 
 
 def permutasi_solusi(solusi, length):
@@ -117,11 +79,7 @@ def permutasi_solusi(solusi, length):
 
 
 if __name__ == "__main__":
-    # tc = input("Nama file testcase: ")
-    tc = "./assets/example.crossword.json"
-    # opsi = input("Lihat proses [y/n]: ")
-    opsi = "y"
-    crossword = Crossword.read_json(tc)
+    crossword = Crossword.read_json("./assets/example.crossword.json")
 
     start_time = time.time()
     list_tts = []
@@ -129,32 +87,20 @@ if __name__ == "__main__":
     classSol = clasify_solusi(crossword.words)
     list_sol = []
     list_sol.append(classSol)
-    allblocks = crossword.get_blocks()
 
     # print(classSol)
     while not len(list_sol[-1]) <= 0:
         level = get_min_class_idx(list_sol[-1])
 
-        curblocks = crossword.get_block(len(list_sol[-1][level][0][1]))
+        curblocks = crossword.puzzle.get_block(len(list_sol[-1][level][0][1]))
         matchAll = True
         i = 0
         newtts = copy.deepcopy(list_tts[-1])
         newsol = copy.deepcopy(list_sol[-1])
         while i < len(curblocks) and matchAll:
-            idxsol = get_idx_sol(
-                newtts,
-                newsol,
-                level,
-                curblocks[i].head,
-                curblocks[i].length,
-                curblocks[i].horizontal,
-            )
+            idxsol = get_idx_sol(newtts, newsol, level, curblocks[i])
             if idxsol != -1:
-                fill_tts(
-                    newtts,
-                    curblocks[i],
-                    newsol[level][idxsol][1],
-                )
+                newtts.fill(curblocks[i], newsol[level][idxsol][1])
                 del newsol[level][idxsol]
                 i += 1
             else:
@@ -174,18 +120,17 @@ if __name__ == "__main__":
                     list_sol[-1], get_min_class_idx(list_sol[-1])
                 )
 
-        if opsi == "y":
-            Crossword.display(list_tts[-1])
+        list_tts[-1].display()
+        print()
+        if len(list_sol[-1]) > 0:
+            for i in range(len(list_sol[-1])):
+                print(list_sol[-1][i], end=" ")
             print()
-            if len(list_sol[-1]) > 0:
-                for i in range(len(list_sol[-1])):
-                    print(list_sol[-1][i], end=" ")
-                print()
-                os.system("clear")
             os.system("clear")
+        os.system("clear")
 
     exectime = time.time() - start_time
     print()
-    Crossword.display(list_tts[-1])
+    list_tts[-1].display()
     print()
     print("Crossword diselesaikan dalam %s seconds " % exectime)
