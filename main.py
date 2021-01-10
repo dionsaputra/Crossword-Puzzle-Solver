@@ -3,6 +3,7 @@ import copy
 import os
 import time
 from crossword.crossword import Crossword
+from crossword.crossword import Block
 
 
 def clasify_solusi(solusi):
@@ -81,14 +82,14 @@ def get_idx_sol(tts, csol, level, head, length, datar):
         return -1
 
 
-def fill_tts(tts, head, length, datar, string):
-    if datar:
-        for i in range(length):
-            tts.setAt(head[0], head[1] + i, string[i])
+def fill_tts(tts, block: Block, string):
+    if block.horizontal:
+        for i in range(block.length):
+            tts.setAt(block.head[0], block.head[1] + i, string[i])
 
     else:
-        for i in range(length):
-            tts.setAt(head[0] + i, head[1], string[i])
+        for i in range(block.length):
+            tts.setAt(block.head[0] + i, block.head[1], string[i])
 
 
 def permutasi_solusi(solusi, length):
@@ -141,14 +142,17 @@ if __name__ == "__main__":
         newsol = copy.deepcopy(list_sol[-1])
         while i < len(curblocks) and matchAll:
             idxsol = get_idx_sol(
-                newtts, newsol, level, curblocks[i][0], curblocks[i][1], curblocks[i][2]
+                newtts,
+                newsol,
+                level,
+                curblocks[i].head,
+                curblocks[i].length,
+                curblocks[i].horizontal,
             )
             if idxsol != -1:
                 fill_tts(
                     newtts,
-                    curblocks[i][0],
-                    curblocks[i][1],
-                    curblocks[i][2],
+                    curblocks[i],
                     newsol[level][idxsol][1],
                 )
                 del newsol[level][idxsol]

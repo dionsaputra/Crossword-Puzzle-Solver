@@ -18,6 +18,13 @@ class Matrix:
         self.elements[self.index(row, col)] = element
 
 
+class Block:
+    def __init__(self, head: [int, int], length: int, horizontal: bool):
+        self.head = head
+        self.length = length
+        self.horizontal = horizontal
+
+
 class Crossword:
     def __init__(self, puzzle: Matrix, words: List[str]):
         self.puzzle = puzzle
@@ -41,7 +48,7 @@ class Crossword:
                 print(tts.getAt(i, j), end=" ")
             print()
 
-    def get_blocks(self):
+    def get_blocks(self) -> List[Block]:
         ret = []
         # horizontal
         for i in range(self.puzzle.height):
@@ -55,7 +62,7 @@ class Crossword:
                     ):
                         k += 1
                     if k > 1:
-                        ret.append((head, k, True))
+                        ret.append(Block(head, k, True))
                     j += k
                 else:
                     j += 1
@@ -73,7 +80,7 @@ class Crossword:
                     ):
                         k += 1
                     if k > 1:
-                        ret.append([head, k, False])
+                        ret.append(Block(head, k, False))
                     i += k
                 else:
                     i += 1
@@ -83,7 +90,7 @@ class Crossword:
         allblocks = self.get_blocks()
         ret = []
         for i in range(len(allblocks)):
-            if allblocks[i][1] == length:
+            if allblocks[i].length == length:
                 ret.append(allblocks[i])
         return ret
 
