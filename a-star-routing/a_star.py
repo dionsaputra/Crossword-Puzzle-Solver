@@ -5,8 +5,6 @@ import copy
 
 HeuristicInfo = {}
 
-initPriorityQueue()
-
 
 def addHeuristicInfo(key, value):
     HeuristicInfo[key] = value
@@ -22,7 +20,7 @@ def AStar(graphInp, heuristicInp):
     graph = Graph(len(graphInp))
 
     # konstrukto priorQueue
-    initPriorityQueue()
+    queue = PriorityQueue()
 
     # isi data graph dengan graph dari input
     for i in range(len(graphInp)):
@@ -45,12 +43,12 @@ def AStar(graphInp, heuristicInp):
         for j in range(len(candidate)):
             if graph.storage[i][j] > 0:
                 # masukkan ke priorQueue
-                add([graph.sum[i] + graph.storage[i][j] + HeuristicInfo[j], j])
+                queue.push([graph.sum[i] + graph.storage[i][j] + HeuristicInfo[j], j])
 
                 # masukkan ke graph
                 graph.sum[j] = graph.sum[i] + graph.storage[i][j]
 
-        nextNode = delete()
+        nextNode = queue.pop()
 
         while graph.storage[solution[len(solution) - 1]][nextNode[1]] <= 0:
             solution = solution[:-1]
