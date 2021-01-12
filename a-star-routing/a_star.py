@@ -1,9 +1,16 @@
-from graph import *
 from priority_queue import *
-from heuristic import *
+from graph import Graph
 import copy
 
+
+HeuristicInfo = {}
+
 initPriorityQueue()
+
+
+def addHeuristicInfo(key, value):
+    HeuristicInfo[key] = value
+    return
 
 
 def isExist(_list, el):
@@ -12,7 +19,7 @@ def isExist(_list, el):
 
 def AStar(graphInp, heuristicInp):
     # konstruktor graph
-    initGraph(len(graphInp))
+    graph = Graph(len(graphInp))
 
     # konstrukto priorQueue
     initPriorityQueue()
@@ -20,7 +27,7 @@ def AStar(graphInp, heuristicInp):
     # isi data graph dengan graph dari input
     for i in range(len(graphInp)):
         for j in range(len(graphInp)):
-            addEdgeGraph(i, j, graphInp[i][j])
+            graph.setEdge(i, j, graphInp[i][j])
 
     # isi data heuristic info dengan heuristic info dari input
     for i in range(len(heuristicInp)):
@@ -33,19 +40,19 @@ def AStar(graphInp, heuristicInp):
     solution.append(start)
 
     while not (isExist(solution, last)):
-        candidate = copy.deepcopy(graph["storage"][i])
+        candidate = copy.deepcopy(graph.storage[i])
         # print(candidate)
         for j in range(len(candidate)):
-            if graph["storage"][i][j] > 0:
+            if graph.storage[i][j] > 0:
                 # masukkan ke priorQueue
-                add([graph["sum"][i] + graph["storage"][i][j] + HeuristicInfo[j], j])
+                add([graph.sum[i] + graph.storage[i][j] + HeuristicInfo[j], j])
 
                 # masukkan ke graph
-                graph["sum"][j] = graph["sum"][i] + graph["storage"][i][j]
+                graph.sum[j] = graph.sum[i] + graph.storage[i][j]
 
         nextNode = delete()
 
-        while graph["storage"][solution[len(solution) - 1]][nextNode[1]] <= 0:
+        while graph.storage[solution[len(solution) - 1]][nextNode[1]] <= 0:
             solution = solution[:-1]
 
         solution.append(nextNode[1])
