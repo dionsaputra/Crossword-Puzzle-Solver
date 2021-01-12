@@ -109,7 +109,7 @@ function addEdge(id) {
 function runAStar() {
   document.getElementById("addEdgeBtn").disabled = true;
   $.ajax({
-    url: "/runAStar",
+    url: "/shortest_route",
     data: {
       graph: JSON.stringify(graph),
       heuristicInfo: JSON.stringify(heuristicInfo),
